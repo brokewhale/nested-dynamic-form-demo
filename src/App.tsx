@@ -3,10 +3,23 @@ import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 import { useFormStore } from './useFormStore';
+import { useForm, useFieldArray } from 'react-hook-form';
 
 function App() {
-  const [count, setCount] = useState(0);
   const { fData, addFdata } = useFormStore();
+
+  const { register, control, watch } = useForm({
+    defaultValues: {
+      inputs: [
+        // Include a default field
+        { points: '', option: '' },
+      ],
+    },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'inputs',
+  });
 
   const handleAddFdata = () => {
     console.log('click');
@@ -26,54 +39,60 @@ function App() {
       },
     ]);
   };
+  watch((data) => console.log(data));
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1 onClick={() => console.log(fData)}>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p onClick={() => handleAddFdata()} className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div className=" min-h-screen flex justify-center items-center">
+      <div className=" max-w-[50vw] w-full min-h-24 bg-cyan-200 rounded-md">
+        <form className="flex flex-col p-6 gap-3">
+          <h1 className=" text-3xl">Name</h1>
+          {fields.map((field, index) => (
+            <div
+              key={field.id}
+              className="w-full flex justify-between gap-8 items-center "
+            >
+              <div className="flex flex-col">
+                <span>Points</span>
+                <input
+                  {...register(`inputs.${index}.points`)}
+                  type="number"
+                  placeholder={`Points ${index + 1}`}
+                  className=" border-gray-400 border rounded-lg text-black text-center"
+                />
+              </div>
+              <div className="flex flex-col flex-1">
+                <span>Option</span>
+                <select
+                  {...register(`inputs.${index}.option`)}
+                  className=" border-gray-400 border rounded-lg text-black text-center"
+                >
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                </select>
+              </div>
+              <div className="flex gap-2 self-end">
+                <div
+                  onClick={() => append({ points: '', option: '' })}
+                  className=" cursor-pointer bg-cyan-400 rounded-lg w-8 h-8 text-white font-bold flex justify-center items-center"
+                >
+                  +
+                </div>
 
-      <ChildApp />
-    </>
+                <div
+                  // disabled={index === 0}
+                  onClick={() => (index === 0 ? '' : remove(index))}
+                  className=" cursor-pointer bg-cyan-400 rounded-lg w-8 h-8 text-white font-bold flex justify-center items-center"
+                >
+                  -
+                </div>
+              </div>
+            </div>
+          ))}
+        </form>
+      </div>
+    </div>
   );
 }
 
 export default App;
-
-function ChildApp() {
-  const { addFdata } = useFormStore();
-  const handleAddFdata = () => {
-    addFdata('Bayo', [
-      {
-        points: 340,
-        option: 'B',
-      },
-      {
-        points: 340,
-        option: 'A',
-      },
-    ]);
-  };
-  return (
-    <div>
-      <h1 onClick={() => handleAddFdata()}>Child App</h1>
-    </div>
-  );
-}

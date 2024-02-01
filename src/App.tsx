@@ -1,96 +1,71 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import './App.css';
 import { useFormStore } from './useFormStore';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { AccountForm } from './AccountForm';
+import { generateObject } from './utils/generatedObject';
+import React from 'react';
 
 function App() {
   const { fData, addFdata } = useFormStore();
-
-  const { register, control, watch } = useForm({
-    defaultValues: {
-      inputs: [
-        // Include a default field
-        { points: '', option: '' },
-      ],
-    },
-  });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'inputs',
+  interface CustomerDetail {
+    name: string;
+    points: number;
+  }
+  const customerDetails: CustomerDetail[] = [
+    { name: 'John', points: 500 },
+    { name: 'Jane', points: 600 },
+  ];
+  const { register, control, getValues, watch } = useForm({
+    defaultValues: generateObject(customerDetails),
   });
 
-  const handleAddFdata = () => {
-    console.log('click');
+  // const handleAddFdata = () => {
+  //   console.log('click');
 
-    addFdata('John', [
-      {
-        points: 340,
-        option: 'C',
-      },
-      {
-        points: 30,
-        option: 'C',
-      },
-      {
-        points: 42,
-        option: 'C',
-      },
-    ]);
-  };
-  watch((data) => console.log(data));
-
+  //   addFdata({
+  //     John: [
+  //       {
+  //         points: '12',
+  //         option: 'A',
+  //       },
+  //       {
+  //         points: '33',
+  //         option: 'C',
+  //       },
+  //     ],
+  //     Jane: [
+  //       {
+  //         points: '23322',
+  //         option: 'A',
+  //       },
+  //       {
+  //         points: '233242',
+  //         option: 'A',
+  //       },
+  //     ],
+  //   });
+  // };
+  // watch((data, { name, type }) => addFdata(data));
   return (
-    <div className=" min-h-screen flex justify-center items-center">
-      <div className=" max-w-[50vw] w-full min-h-24 bg-cyan-200 rounded-md">
-        <form className="flex flex-col p-6 gap-3">
-          <h1 className=" text-3xl">Name</h1>
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="w-full flex justify-between gap-8 items-center "
-            >
-              <div className="flex flex-col">
-                <span>Points</span>
-                <input
-                  {...register(`inputs.${index}.points`)}
-                  type="number"
-                  placeholder={`Points ${index + 1}`}
-                  className=" border-gray-400 border rounded-lg text-black text-center"
-                />
-              </div>
-              <div className="flex flex-col flex-1">
-                <span>Option</span>
-                <select
-                  {...register(`inputs.${index}.option`)}
-                  className=" border-gray-400 border rounded-lg text-black text-center"
-                >
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                  <option value="C">C</option>
-                </select>
-              </div>
-              <div className="flex gap-2 self-end">
-                <div
-                  onClick={() => append({ points: '', option: '' })}
-                  className=" cursor-pointer bg-cyan-400 rounded-lg w-8 h-8 text-white font-bold flex justify-center items-center"
-                >
-                  +
-                </div>
+    <div className=" min-h-screen flex justify-center items-center flex-col gap-6">
+      {customerDetails.map((customerDetail, index) => (
+        <div
+          className="w-full flex justify-center items-center"
+          key={index + Math.random()}
+        >
+          <AccountForm
+            details={customerDetail}
+            register={register}
+            control={control}
+            getValues={getValues}
+          />
+        </div>
+      ))}
 
-                <div
-                  // disabled={index === 0}
-                  onClick={() => (index === 0 ? '' : remove(index))}
-                  className=" cursor-pointer bg-cyan-400 rounded-lg w-8 h-8 text-white font-bold flex justify-center items-center"
-                >
-                  -
-                </div>
-              </div>
-            </div>
-          ))}
-        </form>
-      </div>
+      <div onClick={() => console.log(fData)}>sds</div>
+      {/* <div onClick={() => handleAddFdata()}>add</div> */}
     </div>
   );
 }

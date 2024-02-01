@@ -5,26 +5,21 @@ interface UserDetail {
   points: number;
   option: string;
 }
-type UserDetailArray = UserDetail[];
+
 type State = {
-  fData: Record<string, UserDetailArray>;
+  fData: Record<string, UserDetail[]>;
 };
 
 type Actions = {
-  addFdata: (id: string, data: UserDetailArray) => void;
+  addFdata: (data: Record<string, UserDetail[]>) => void;
 };
 
-export const useFormStore = create<State & Actions>()(
-  immer((set) => ({
-    fData: {},
-    addFdata: (id: string, data: UserDetailArray) => {
-      set((state) => {
-        const key = id;
-        state.fData[key] = data;
-      });
-    },
-  }))
-);
+export const useFormStore = create<State & Actions>()((set) => ({
+  fData: {},
+
+  addFdata: (data: Record<string, UserDetail[]>) =>
+    set((state) => (state.fData = data)),
+}));
 
 // export const useFormStore = create<State & Actions>()(
 //     immer((set) => ({
